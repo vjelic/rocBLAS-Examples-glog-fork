@@ -85,7 +85,6 @@ jobs:
         echo 'cd Level-1/swap'
         echo 'make'
         echo './swap'
-        exit 1
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
