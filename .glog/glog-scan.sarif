@@ -1,0 +1,109 @@
+{
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "Glog.AI",
+          "organization": "Glog.AI",
+          "fullName": "Glog, Making software more secure",
+          "version": "1.0.0",
+          "semanticVersion": "1.0.0",
+          "informationUri": "https://www.glog.ai",
+          "rules": [
+            {
+              "id": "glog-6857b0c2-4f4b-4394-b0ae-76b4ed9fd9bb",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nThe vulnerability in question is related to the `malloc` function in C++. This function is used to allocate a block of memory dynamically. If the size of the memory to be allocated is calculated incorrectly, it can lead to a buffer overflow vulnerability. In this case, the multiplication `mBatchCount * sizeof(T*)` could potentially result in an integer overflow if `mBatchCount` is a large value. This would then cause `malloc` to allocate less memory than expected, leading to a buffer overflow when the memory is used.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, you should always check the result of the multiplication for overflow before passing it to `malloc`. If an overflow is detected, the program should handle it gracefully, for example by returning an error or by limiting the size of the allocation.\n\n## Source Code Fix Recommendation\n\nHere is a simple way to check for overflow:\n\n```cpp\nif (mBatchCount > SIZE_MAX / sizeof(T*)) {\n    // handle overflow, e.g. by returning an error\n} else {\n    T* ptr = (T*) malloc(mBatchCount * sizeof(T*));\n    if (ptr == NULL) {\n        // handle failed allocation\n    } else {\n        // use ptr\n    }\n}\n```\n\nThis code checks if the multiplication would overflow by comparing `mBatchCount` with the maximum value that can be represented by `size_t` (the type returned by `sizeof`) divided by `sizeof(T*)`. If `mBatchCount` is larger than this value, the multiplication would overflow, so the code handles the overflow. Otherwise, it proceeds with the allocation.\n\n## Library Dependencies\n\nThe code example does not require any additional library dependencies beyond the standard C++ libraries.\n\n## OWASP and CWE Links\n\n- [CWE-190: Integer Overflow or Wraparound](https://cwe.mitre.org/data/definitions/190.html)\n- [CWE-680: Integer Overflow to Buffer Overflow](https://cwe.mitre.org/data/definitions/680.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS161085"
+                ]
+              }
+            }
+          ],
+          "language": "en-US",
+          "contents": [
+            "localizedData",
+            "nonLocalizedData"
+          ],
+          "isComprehensive": false
+        }
+      },
+      "language": "en-US",
+      "results": [
+        {
+          "ruleId": "glog-6857b0c2-4f4b-4394-b0ae-76b4ed9fd9bb",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Detected Vulnerability in C Function (malloc)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "common/memoryHelpers.hpp"
+                },
+                "region": {
+                  "startLine": 169,
+                  "startColumn": 25,
+                  "endLine": 169,
+                  "endColumn": 56,
+                  "charOffset": 5431,
+                  "charLength": 31,
+                  "snippet": {
+                    "text": "malloc(mBatchCount * sizeof(T*)",
+                    "rendered": {
+                      "text": "malloc(mBatchCount * sizeof(T*)",
+                      "markdown": "`malloc(mBatchCount * sizeof(T*)`"
+                    }
+                  },
+                  "sourceLanguage": "cpp"
+                }
+              }
+            }
+          ],
+          "fixes": [
+            {
+              "description": {
+                "text": "If the value provided to malloc is the result of unsafe integer math, it can result in an exploitable condition. "
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "common/memoryHelpers.hpp"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 5431,
+                        "charLength": 31
+                      },
+                      "insertedContent": {
+                        "text": "calloc(<number of elements>, <size of each element>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "BestPractice",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "API.DangerousAPI.ProblematicFunction"
+            ]
+          }
+        }
+      ],
+      "newlineSequences": [
+        "\r\n",
+        "\n"
+      ]
+    }
+  ]
+}
